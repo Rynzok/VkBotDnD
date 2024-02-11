@@ -1,12 +1,11 @@
 from random import randint
-
+from dotenv import load_dotenv
+import os
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-
-vk_session = vk_api.VkApi(token="vk1.a.CWtL1EKHPofoTiVrmYKZuSz9x3mvXJp2f7RgRU5HiOZVVwfA7PWPhIt8N4c6TUHt9TwOqkYS4ud40"
-                                "-Cv0FyvyZ2F6KlnyVgdhwbLBbxpaBnGuuhj1JT0Tx1WTwxGg2_3YkDsskeCZ_UjU03QluG8g8qjMR-wv"
-                                "-Bp6PfUT9-85s8IlOymVF4AU_2lM9HkNJvG6cNz33_tMf9gUQZm8sHx0Q")
+load_dotenv()
+vk_session = vk_api.VkApi(token=os.getenv('TOKEN'))
 vk = vk_session.get_api()
 longpool = VkLongPoll(vk_session)
 
