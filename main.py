@@ -52,18 +52,54 @@ def create_characteristic():
     return some_text
 
 
+def sum_dice(msg):
+    border = 0
+    for i in range(len(msg)):
+        if msg[i] == 'd' or msg[i] == 'к':
+            border = i
+            break
+    if border == 0:
+        return "Ошибка. Нет ключевой буквы d или k"
+    else:
+        count = int(msg[:border])
+        facets = msg[(border + 1):]
+        if facets == "":
+            facets = 20
+        else:
+            facets = int(facets)
+        strings = [0 for _ in range(0, count)]
+        for i in range(len(strings)):
+            strings[i] = randint(0, facets)
+        text_box = f"бросок {msg}: {sum(strings)} ("
+        for string in strings:
+            text_box += str(string) + " + "
+        text_box = text_box[:-3]
+        text_box += ")"
+        return text_box
+
+
 for event in longpool.listen():
     if event.type == VkEventType.MESSAGE_NEW:
-        if event.to_me:
-            msg = event.text.lower()
+        if event.to_me and event.text.lower()[0] == '/':
+            msg = event.text.lower()[1::].replace(" ", "")
             id = event.user_id
-            if msg == '/help' or msg == '/h':
+            if msg == 'help' or msg == 'h':
                 send_some_msg(id, "Помощь")
-            elif msg == '/s' or msg == '/scores':
+            # Создание 6 характеристик персонажа методом броска 4 кубиков
+            elif msg == 's' or msg == 'scores':
                 send_some_msg(id, f"{create_characteristic()}")
-            elif msg == '/d' or msg == '/к':
+            # Бросок кубика 20 граней
+            elif msg == 'd' or msg == 'к':
                 send_some_msg(id, f"Бросок d: {randint(1, 20)}")
-            elif msg == '/d%' or msg == '/к%':
+            # Бросок процентного кубика
+            elif msg == 'd%' or msg == 'к%':
                 send_some_msg(id, f"Бросок d%: {randint(0, 100)}%")
-            elif msg[:2] == '/d' or msg[:2] == '/к%' and msg[2] != '%' and msg[2] != "":
-                send_some_msg(id, f"Бросок d{msg[2::]}: {randint(0, int(msg[2::]))}")
+            # Бросок кубика с заданым числом граней
+            elif msg[0] == 'd' or msg[0] == 'к' and msg[1] != '%' and msg[1] != "":
+                send_some_msg(id, f"Бросок d{msg[1::]}: {randint(0, int(msg[1::]))}")
+            # Сумма бросков
+            elif msg[0] != 'd' and msg[0] != 'к':
+                try:
+                    send_some_msg(id, f"{sum_dice(msg)}")
+                except:
+                    send_some_msg(id, f"Lol")
