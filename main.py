@@ -32,9 +32,10 @@ class Characteristics:
 
 class Alias:
     name = ""
-    dict_values = {'count': 0, 'facets': 0, 'bomb': 0, 'mod': 0, 'multi': 0, 'resist': 0}
 
     def __init__(self, msg):
+        self.dict_values = {'count': 1, 'facets': 20, 'bomb': 0, 'mod': 0, 'multi': 1, 'resist': 0}
+        self.command = msg
         list_symbols = ['d', '!', '+', 'x', 'r']
         list_characters = []
         list_key = ['count', 'facets']
@@ -78,8 +79,37 @@ class Alias:
                 self.dict_values[key] = 1
             elif key == 'resist':
                 self.dict_values[key] = 1
+            elif key == 'multi':
+                self.dict_values[key] = 1
             else:
                 self.dict_values[key] = 0
+
+    def calculation(self):
+        cubes = [0 for _ in range(self.dict_values['count'])]
+        for i in range(self.dict_values['count']):
+            cubes[i] = randint(0, self.dict_values['facets'])
+            if i < self.dict_values['bomb'] and cubes[i] == self.dict_values['facets']:
+                cubes.append(randint(0, self.dict_values['facets']))
+
+        result = (sum(cubes) + self.dict_values['mod']) * self.dict_values['multi']
+        if self.dict_values['resist'] == 1:
+            result = result / 2
+
+        text_box = f"Бросок {self.command}: {result} ("
+        if self.dict_values['resist'] == 1:
+            text_box += "половина от "
+        for i in cubes:
+            text_box += str(i) + " + "
+        if self.dict_values['mod'] != 0:
+            text_box += str(self.dict_values['mod'])
+        else:
+            text_box = text_box[:-2]
+        if self.dict_values['multi'] != 1:
+            text_box += f" помноженное на {self.dict_values['multi']})"
+        else:
+            text_box += ")"
+
+        return result, text_box
 
 
 def create_characteristic():
@@ -104,30 +134,11 @@ def create_characteristic():
     return some_text
 
 
-def sum_dice(msg):
-    border = 0
-    for i in range(len(msg)):
-        if msg[i] == 'd' or msg[i] == 'к':
-            border = i
-            break
-    if border == 0:
-        return "Ошибка. Нет ключевой буквы d или k"
-    else:
-        count = int(msg[:border])
-        facets = msg[(border + 1):]
-        if facets == "":
-            facets = 20
-        else:
-            facets = int(facets)
-        strings = [0 for _ in range(0, count)]
-        for i in range(len(strings)):
-            strings[i] = randint(0, facets)
-        text_box = f"бросок {msg}: {sum(strings)} ("
-        for string in strings:
-            text_box += str(string) + " + "
-        text_box = text_box[:-3]
-        text_box += ")"
-        return text_box
+def calculation_dice(string):
+    command = Alias(string)
+    result, text_box = command.calculation()
+    del command
+    return text_box
 
 
 for event in longpool.listen():
@@ -140,18 +151,8 @@ for event in longpool.listen():
             # Создание 6 характеристик персонажа методом броска 4 кубиков
             elif msg == 's' or msg == 'scores':
                 send_some_msg(id, f"{create_characteristic()}")
-            # Бросок кубика 20 граней
-            elif msg == 'd' or msg == 'к':
-                send_some_msg(id, f"Бросок d: {randint(1, 20)}")
-            # Бросок процентного кубика
-            elif msg == 'd%' or msg == 'к%':
-                send_some_msg(id, f"Бросок d%: {randint(0, 100)}%")
-            # Бросок кубика с заданым числом граней
-            elif msg[0] == 'd' or msg[0] == 'к' and msg[1] != '%' and msg[1] != "":
-                send_some_msg(id, f"Бросок d{msg[1::]}: {randint(0, int(msg[1::]))}")
-            # Сумма бросков
-            elif msg[0] != 'd' and msg[0] != 'к':
+            elif str(msg).find('d') != -1:
                 try:
-                    send_some_msg(id, f"{sum_dice(msg)}")
+                    send_some_msg(id, f"{calculation_dice(msg)}")
                 except:
-                    send_some_msg(id, f"Lol")
+                    send_some_msg(id, f"Что-то введено не верно...Но как?")
