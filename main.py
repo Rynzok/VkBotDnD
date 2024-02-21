@@ -30,6 +30,58 @@ class Characteristics:
                     self.sym_string[i] += self.parameters[i][j]
 
 
+class Alias:
+    name = ""
+    dict_values = {'count': 0, 'facets': 0, 'bomb': 0, 'mod': 0, 'multi': 0, 'resist': 0}
+
+    def __init__(self, msg):
+        list_symbols = ['d', '!', '+', 'x', 'r']
+        list_characters = []
+        list_key = ['count', 'facets']
+
+        # Получаем список ключевых символов котороые есть в строке
+        for i in list_symbols:
+            if msg.find(i) != -1:
+                list_characters.append(i)
+
+        for i in list_characters:
+            if i == '!':
+                list_key.append('bomb')
+            elif i == '+':
+                list_key.append('mod')
+            elif i == 'x':
+                list_key.append('multi')
+            elif i == 'r':
+                list_key.append('resist')
+
+        list_characters.append('z')
+        msg = msg + 'z'
+
+        buff = ""
+        j = 0
+        for i in range(len(msg)):
+            buff += msg[i]
+            if buff[-1] == list_characters[j]:
+                self.set_values(list_key[j], buff[:-1])
+                j += 1
+                buff = ""
+
+    def set_values(self, key, value):
+        if value != '':
+            self.dict_values[key] = int(value)
+        else:
+            if key == 'count':
+                self.dict_values[key] = 1
+            elif key == 'facets':
+                self.dict_values[key] = 20
+            elif key == 'bomb':
+                self.dict_values[key] = 1
+            elif key == 'resist':
+                self.dict_values[key] = 1
+            else:
+                self.dict_values[key] = 0
+
+
 def create_characteristic():
     new_characteristic = Characteristics()
     strings = ["" for _ in range(0, 6)]
