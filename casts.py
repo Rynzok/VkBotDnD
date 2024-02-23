@@ -95,6 +95,6 @@ class Cast:
         keys = []
         for key in self.dict_values.keys():
             keys.append(key)
-        for string in list_tuple:
-            for i in range(len(string)):
-                self.dict_values[keys[i]] = string[i]
+
+        for i in range(len(keys)):
+            self.dict_values[keys[i]] = list_tuple[i + 1]

@@ -104,6 +104,14 @@ def alis_del_db(string):
     return "Удаление совершено"
 
 
+def alias_release(string):
+    list_string = string.split()
+    command = Alias()
+    command.create_from_db(list_string[1])
+    text_box = f"Алиас: {list_string[1]} \n" + command.sum()
+    return text_box
+
+
 for event in longpool.listen():
     if event.type == VkEventType.MESSAGE_NEW:
         if event.to_me and event.text.lower()[0] == '/':
@@ -126,6 +134,9 @@ for event in longpool.listen():
 
             elif msg == 'alias':
                 send_some_msg(id, f"{alias_read_db()}")
+
+            elif msg != 'alias' and str(msg).find('alias') != -1 and str(msg).find('del') == -1:
+                send_some_msg(id, f"{alias_release(msg)}")
 
             elif str(msg).find('del') != -1:
                 send_some_msg(id, f"{alis_del_db(msg)}")

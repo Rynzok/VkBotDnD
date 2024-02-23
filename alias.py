@@ -20,7 +20,7 @@ class Alias:
         cursor = connection.cursor()
         cursor.execute("SELECT id FROM Alias WHERE name = ?", [name])
         alias_id = cursor.fetchone()
-        cursor.execute("SELECT FROM Casts WHERE Alias_id = ?", [alias_id[0]])
+        cursor.execute("SELECT * FROM Casts WHERE Alias_id = ?", [alias_id[0]])
         list_string = cursor.fetchall()
         connection.close()
         for string in list_string:
