@@ -4,6 +4,7 @@ import os
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from alias import Alias
+import sqlite3
 
 load_dotenv()
 vk_session = vk_api.VkApi(token=os.getenv('TOKEN'))
@@ -71,16 +72,49 @@ def create_alias(string):
     return text_box
 
 
+def alias_read_db():
+    connection = sqlite3.connect('my_database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM Alias")
+    # text_box = "".join(cursor.fetchall())
+    text_box = []
+    for i in cursor.fetchall():
+        text_box.append(i[0])
+    some_text = " Список Алиасов: \n"
+    for i in text_box:
+        some_text += str(i) + "\n"
+
+    connection.close()
+    return some_text
+
+
+def alis_del_db(string):
+    list_string = string.split()
+    connection = sqlite3.connect('my_database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT id FROM Alias WHERE name = ?", [list_string[1]])
+    alias_id = cursor.fetchone()
+    cursor.execute("DELETE FROM Alias WHERE name = ?", [list_string[1]])
+    cursor.execute("DELETE FROM Casts WHERE Alias_id = ?", [alias_id[0]])
+    connection.commit()
+    connection.close()
+
+    return "Удаление совершено"
+
+
 for event in longpool.listen():
     if event.type == VkEventType.MESSAGE_NEW:
         if event.to_me and event.text.lower()[0] == '/':
             msg = event.text.lower()[1::]
             id = event.user_id
+
             if msg == 'help' or msg == 'h':
                 send_some_msg(id, "Помощь")
+
             # Создание 6 характеристик персонажа методом броска 4 кубиков
             elif msg == 's' or msg == 'scores':
                 send_some_msg(id, f"{create_characteristic()}")
+
             # Оброботка вех бросков кубика
             elif str(msg).find('d') != -1 and str(msg).find('al') == -1:
                 try:
@@ -88,8 +122,16 @@ for event in longpool.listen():
                 except:
                     send_some_msg(id, f"Что-то введено не верно...Но как?")
 
+            elif msg == 'alias':
+                send_some_msg(id, f"{alias_read_db()}")
+
+            elif str(msg).find('del') != -1:
+                send_some_msg(id, f"{alis_del_db(msg)}")
+
             elif str(msg).find('al') != -1:
-                try:
-                    send_some_msg(id, f"{create_alias(msg)}")
-                except:
-                    send_some_msg(id, f"БД пошло по пизде")
+                # try:
+                send_some_msg(id, f"{create_alias(msg)}")
+                # except:
+                #     send_some_msg(id, f"БД пошло по пизде")
+
+
