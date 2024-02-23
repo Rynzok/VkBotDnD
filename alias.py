@@ -4,12 +4,29 @@ import sqlite3
 
 class Alias:
 
-    def __init__(self, list_string):
+    def __init__(self):
         self.id = None
         self.name = None
         self.list_cast = []
+
+    def create_from_string(self, list_string):
         for string in list_string:
-            self.list_cast.append(Cast(string))
+            command = Cast(string)
+            command.create_from_string()
+            self.list_cast.append(command)
+
+    def create_from_db(self, name):
+        connection = sqlite3.connect('my_database.db')
+        cursor = connection.cursor()
+        cursor.execute("SELECT id FROM Alias WHERE name = ?", [name])
+        alias_id = cursor.fetchone()
+        cursor.execute("SELECT FROM Casts WHERE Alias_id = ?", [alias_id[0]])
+        list_string = cursor.fetchall()
+        connection.close()
+        for string in list_string:
+            command = Cast("")
+            command.create_from_db(string)
+            self.list_cast.append(command)
 
     def create_name(self, name):
         self.name = name

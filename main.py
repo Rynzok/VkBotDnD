@@ -55,7 +55,8 @@ def create_characteristic():
 
 
 def calculation_dice(string):
-    command = Alias(string.split())
+    command = Alias()
+    command.create_from_string(string.split())
     text_box = command.sum()
     return text_box
 
@@ -65,8 +66,9 @@ def create_alias(string):
     list_string.pop(0)
     name = list_string[0]
     list_string.pop(0)
-    command = Alias(list_string)
+    command = Alias()
     command.create_name(name)
+    command.create_from_string(list_string)
     command.write_to_db()
     text_box = command.sum()
     return text_box

@@ -6,13 +6,15 @@ class Cast:
     def __init__(self, string):
         self.dict_values = {'count': 1, 'facets': 20, 'bomb': 0, 'mod': 0, 'multi': 1, 'resist': 0, 'percent': 0}
         self.command = string
+
+    def create_from_string(self):
         list_symbols = ['d', '%', '!', '+', 'x', 'r']
         list_characters = []
         list_key = ['count', 'facets']
 
         # Получаем список ключевых символов котороые есть в строке
         for i in list_symbols:
-            if string.find(i) != -1:
+            if self.command.find(i) != -1:
                 list_characters.append(i)
 
         for i in list_characters:
@@ -28,7 +30,7 @@ class Cast:
                 list_key.append('percent')
 
         list_characters.append('z')
-        string = string + 'z'
+        string = self.command + 'z'
 
         buff = ""
         j = 0
@@ -88,3 +90,11 @@ class Cast:
             text_box += ")"
 
         return result, text_box
+
+    def create_from_db(self, list_tuple):
+        keys = []
+        for key in self.dict_values.keys():
+            keys.append(key)
+        for string in list_tuple:
+            for i in range(len(string)):
+                self.dict_values[keys[i]] = string[i]
