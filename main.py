@@ -60,13 +60,13 @@ def calculation_dice(string):
 
 
 def create_alias(string):
-    list_string = string.split
+    list_string = string.split()
     list_string.pop(0)
     name = list_string[0]
     list_string.pop(0)
-    command = Alias(string)
+    command = Alias(list_string)
     command.create_name(name)
-    # command.write_to_db()
+    command.write_to_db()
     text_box = command.sum()
     return text_box
 
@@ -82,7 +82,7 @@ for event in longpool.listen():
             elif msg == 's' or msg == 'scores':
                 send_some_msg(id, f"{create_characteristic()}")
             # Оброботка вех бросков кубика
-            elif str(msg).find('d') != -1:
+            elif str(msg).find('d') != -1 and str(msg).find('al') == -1:
                 try:
                     send_some_msg(id, f"{calculation_dice(msg)}")
                 except:
