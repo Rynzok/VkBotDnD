@@ -2,18 +2,20 @@ from random import randint
 from dotenv import load_dotenv
 import os
 import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_api.utils import get_random_id
+
 from alias import Alias
 from work_with_db import alias_all_read_db, alis_del_db
 
 load_dotenv()
 vk_session = vk_api.VkApi(token=os.getenv('TOKEN'))
 vk = vk_session.get_api()
-longpool = VkLongPoll(vk_session)
+longpool = VkBotLongPoll(vk_session, group_id=224651304, wait=25)
 
 
 def send_some_msg(id, some_text):
-    vk_session.method("messages.send", {"user_id": id, "message": some_text, "random_id": 0})
+    vk.messages.send(random_id=get_random_id(), peer_id=id, message=some_text)
 
 
 class Characteristics:
@@ -94,10 +96,12 @@ def alias_release(string):
 
 
 for event in longpool.listen():
-    if event.type == VkEventType.MESSAGE_NEW:
-        if event.to_me and event.text.lower()[0] == '/':
-            msg = event.text.lower()[1::]
-            id = event.user_id
+    if event.type == VkBotEventType.MESSAGE_NEW:
+        if event.from_user or event.from_chat and event.message.get('text').lower()[0] == '/':
+
+            msg = event.message.get('text').lower()[1::]
+            message = event.obj['message']
+            id = message['peer_id']
 
             # Вывод информации
             if msg == 'help' or msg == 'h':
@@ -135,3 +139,7 @@ for event in longpool.listen():
                         send_some_msg(id, f"{alias_release(msg)}")
                 except:
                     send_some_msg(id, f"Где-то есть ошибка")
+
+            else:
+                send_some_msg(id, f"Не попало в ifы")
+
