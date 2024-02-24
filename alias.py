@@ -21,7 +21,7 @@ class Alias:
         list_string, string = casts_read_from_db(name)
         self.string = string
         for string in list_string:
-            command = Cast("")
+            command = Cast(string[1])
             command.create_from_db(string)
             self.list_cast.append(command)
 

@@ -99,6 +99,7 @@ for event in longpool.listen():
             msg = event.text.lower()[1::]
             id = event.user_id
 
+            # Вывод информации
             if msg == 'help' or msg == 'h':
                 send_some_msg(id, "Помощь")
 
@@ -107,25 +108,30 @@ for event in longpool.listen():
                 send_some_msg(id, f"{create_characteristic()}")
 
             # Оброботка вех бросков кубика
-            elif str(msg).find('d') != -1 and str(msg).find('al') == -1:
+            elif (str(msg).find('d') != -1 or str(msg).find('к') != -1)\
+                    and str(msg).find('al') == -1 and str(msg).find('ал') == -1:
                 try:
+                    msg.replace('к', 'd')
                     send_some_msg(id, f"{calculation_dice(msg)}")
                 except:
                     send_some_msg(id, f"Что-то введено не верно...Но как?")
 
-            elif msg == 'alias':
+            # Получение списка всез Алиасов
+            elif msg == 'alias' or msg == 'алиасы' or msg == 'al' or msg == 'ал':
                 send_some_msg(id, f"{alias_read_db()}")
 
-            elif msg != 'alias' and str(msg).find('alias') != -1 and str(msg).find('del') == -1:
-                send_some_msg(id, f"{alias_release(msg)}")
-
+            # Удаление Алиаса
             elif str(msg).find('del') != -1:
                 send_some_msg(id, f"{alis_del_db(msg)}")
 
-            elif str(msg).find('al') != -1:
-                # try:
-                send_some_msg(id, f"{create_alias(msg)}")
-                # except:
-                #     send_some_msg(id, f"БД пошло по пизде")
-
-
+            # Работа с Алиасами
+            elif str(msg).find('al') != -1 or str(msg).find('ал') != -1 and str(msg).find('del') == -1:
+                try:
+                    # Создание Алиаса
+                    if len(str(msg).split()) > 2:
+                        send_some_msg(id, f"{create_alias(msg)}")
+                    # Активация Алиаса
+                    else:
+                        send_some_msg(id, f"{alias_release(msg)}")
+                except:
+                    send_some_msg(id, f"Где-то есть ошибка")
