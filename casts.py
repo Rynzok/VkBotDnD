@@ -41,6 +41,14 @@ class Cast:
                 j += 1
                 buff = ""
 
+    def create_from_db(self, list_tuple):
+        keys = []
+        for key in self.dict_values.keys():
+            keys.append(key)
+
+        for i in range(len(keys)):
+            self.dict_values[keys[i]] = list_tuple[i + 2]
+
     def set_values(self, key, value):
         if value != '':
             self.dict_values[key] = int(value)
@@ -91,10 +99,3 @@ class Cast:
 
         return result, text_box
 
-    def create_from_db(self, list_tuple):
-        keys = []
-        for key in self.dict_values.keys():
-            keys.append(key)
-
-        for i in range(len(keys)):
-            self.dict_values[keys[i]] = list_tuple[i + 1]

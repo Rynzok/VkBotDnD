@@ -4,7 +4,7 @@ import os
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from alias import Alias
-import sqlite3
+from work_with_db import alias_all_read_db, alis_del_db
 
 load_dotenv()
 vk_session = vk_api.VkApi(token=os.getenv('TOKEN'))
@@ -75,40 +75,21 @@ def create_alias(string):
 
 
 def alias_read_db():
-    connection = sqlite3.connect('my_database.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT name FROM Alias")
-    # text_box = "".join(cursor.fetchall())
+    list_alias = alias_all_read_db()
     text_box = []
-    for i in cursor.fetchall():
-        text_box.append(i[0])
+    for i in list_alias:
+        text_box.append(f"{i[0]}: {i[1]}")
     some_text = " Список Алиасов: \n"
     for i in text_box:
         some_text += str(i) + "\n"
-
-    connection.close()
     return some_text
-
-
-def alis_del_db(string):
-    list_string = string.split()
-    connection = sqlite3.connect('my_database.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT id FROM Alias WHERE name = ?", [list_string[1]])
-    alias_id = cursor.fetchone()
-    cursor.execute("DELETE FROM Alias WHERE name = ?", [list_string[1]])
-    cursor.execute("DELETE FROM Casts WHERE Alias_id = ?", [alias_id[0]])
-    connection.commit()
-    connection.close()
-
-    return "Удаление совершено"
 
 
 def alias_release(string):
     list_string = string.split()
     command = Alias()
     command.create_from_db(list_string[1])
-    text_box = f"Алиас: {list_string[1]} \n" + command.sum()
+    text_box = f"Алиас: {list_string[1]} ({command.string}) \n" + command.sum()
     return text_box
 
 
