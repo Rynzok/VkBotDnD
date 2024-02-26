@@ -5,7 +5,7 @@ class Cast:
 
     def __init__(self, string):
         self.dict_values = {'count': 1, 'facets': 20, 'bomb': 0, 'mod': 0, 'multi': 1, 'resist': 0, 'percent': 0}
-        self.command = string.replace('к', 'd')
+        self.command = string.replace('к', 'd').replace('*', 'x').replace('с', 'r')
 
     def create_from_string(self):
         list_symbols = ['d', '%', '!', '+', 'x', 'r']

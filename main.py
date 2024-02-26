@@ -7,6 +7,7 @@ from vk_api.utils import get_random_id
 
 from alias import Alias
 from work_with_db import alias_all_read_db, alis_del_db
+import help
 
 load_dotenv()
 vk_session = vk_api.VkApi(token=os.getenv('TOKEN'))
@@ -109,11 +110,11 @@ for event in longpool.listen():
             msg = event.message.get('text').lower()[1::]
             message = event.obj['message']
             id = message['peer_id']
-            user_id = event.message.get('from_id')
-            name = get_name(user_id)
+            name = get_name(event.message.get('from_id'))
+
             # Вывод информации
             if msg == 'help' or msg == 'h':
-                send_some_msg(id, f"{name}, Помощь")
+                send_some_msg(id, f"{name}, {help.manual}")
 
             # Создание 6 характеристик персонажа методом броска 4 кубиков
             elif msg == 's' or msg == 'scores':
@@ -123,7 +124,6 @@ for event in longpool.listen():
             elif (str(msg).find('d') != -1 or str(msg).find('к') != -1)\
                     and str(msg).find('al') == -1 and str(msg).find('ал') == -1:
                 try:
-                    msg.replace('к', 'd')
                     send_some_msg(id, f"{name}, {calculation_dice(msg)}")
                 except:
                     send_some_msg(id, f"{name}, Что-то введено не верно...Но как?")
